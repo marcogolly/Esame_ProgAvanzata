@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <exception>
 
 //Definizione della classe
 class Matrix {
@@ -30,6 +31,8 @@ public:
   // funzione che visualizza il valore presente in posizione i,j
   int getElement(int i, int j) const { return matrix[i][j]; }
 
+  //serve verificare che la matrice sia quadrata altriemnti non si può calcolare il determinante
+  
   // funzione per visualizzare la matrice
   void print() const {
     for (int i = 0; i < rows; i++) {
