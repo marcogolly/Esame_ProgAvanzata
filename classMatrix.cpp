@@ -31,7 +31,7 @@ public:
   // funzione che visualizza il valore presente in posizione i,j
   int getElement(int i, int j) const { return matrix[i][j]; }
 
-  //serve verificare che la matrice sia quadrata altriemnti non si può calcolare il determinante
+  //serve verificare che la matrice sia quadrata altrimenti non si può calcolare il determinante
   
   // funzione per visualizzare la matrice
   void print() const {
@@ -43,3 +43,5 @@ public:
     }
   }
 };
+
+ 
