@@ -40,18 +40,22 @@ public:
 
       for (int i=0; i<rows-1; i++){
         
+        bool flag = true;
         if (res[i][i] ==0){
-          //flag per vedere se c'è una riga non nulla da scambiare
-          bool flag = false;
-
-          for (int l=i;l<rows; l++ )
+          //flag per vedere se c'è una riga dove res[l][i] non è nullo
+          flag = false;
+          for (int l=i;l<rows; l++ ){
             if(res[l][i] !=0){
               flag = true;
-              //TODO: swap rows i and l
-              continue;
+
+              //scambio la riga l con la riga i
+              std::swap(res[l], res[i]);
+              //esco dal for e posso andare avanti
+              break;
             }
+          }
         }
-        //se non ho trovato una riga da scambiare significa che tutta la colonna i è vuota dalla riga i in giù quindi vado avanti
+        //se res[i][i] ==0 e non ho trovato una riga da scambiare significa che tutta la colonna i è vuota dalla riga i in giù quindi salto l'indice
         if (!flag)
           continue;
         
@@ -66,6 +70,64 @@ public:
       }
       return res;
   }
+
+int getRank() {
+  // Iniziamo usando l'eliminazione di gauss
+  Matrix<T> res = gauss();
+  std::cout<< "matrice res\n";
+  res.print();
+  // contiamo le righe non nulle
+  int rank = 0;
+  for (int i = 0; i < rows; i++) {
+    bool null_row = false;
+    for (int j = 0; j < cols; j++) {
+      if (res[i][j] != 0) {
+        null_row = true;
+        break;
+      }
+    }
+    if (null_row) {
+      rank++;
+    }
+  }
+  return rank;
+}
+
+
+  T getDeterminant() {
+  // Check if the matrix is square
+  if (rows != cols) {
+    //throw std::invalid_argument("matrice non quadrata");
+    std::cout<<"matrice non quadrata";
+  }
+
+  // uso gauss
+  Matrix res = gauss();
+
+  // il determinante è uguale al prodotto dei pivot
+  T determinant = 1;
+  for (int i = 0; i < rows; i++) {
+    determinant *= res[i][i];
+  }
+
+  return determinant;
+}
+
+//moltiplicazione riga - colonna
+Matrix mult(Matrix<T> B){
+  Matrix<T> res = Matrix(rows, B.getCols());
+  
+  for (int  i =0; i<rows; i++){
+    for (int j =0; j<B.getCols(); j++){
+      res[i][j] =0;
+      for (int k =0; k< rows; k++){
+        std::cout<< matrix[i][k] * B[k][j]<<"\n";
+        res[i][j] += matrix[i][k] * B[k][j];
+      }
+    }
+  }
+  return res;
+}
   
   
   // funzione per visualizzare la matrice
@@ -84,22 +146,24 @@ public:
 int main(){
   srand(time(0));  // Seed per il random
 
-    Matrix<float> m(3,3);
-    
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 3; j++){
-            //se voglio inizializzare una matrice random
-            //m[i][j] = rand();
+  Matrix<float> m(3,3);
+  
+  for (int i = 0; i < 3; i++){
+    for (int j = 0; j < 3; j++){
+      //se voglio inizializzare una matrice random
+      //m[i][j] = rand();
 
-            //inizializzazione di prova
-            m[i][j] = i+1+j;
-        }
+      //inizializzazione di prova
+      m[i][j] = i+1+j;
     }
-    std::cout<<"matrice m: \n";
-    m.print();
-    std::cout<<"matrice gauss: \n";
-    m.gauss().print();
+  }
+  std::cout<<"matrice m: \n";
+  m.print();
+  //std::cout<<"matrice gauss: \n";
+  //m.gauss().print();
+  //std::cout<<"determinante: "<<m.getDeterminant()<<"\n";
+  //std::cout<<"rango: "<<m.getRank()<<"\n";
+  //m.print();
 
-    m.print();
-
+  m.mult(m).print();
 }
