@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ostream>
 #include <vector>
+
 // Definizione della classe
 template <typename T> class Matrix {
 private:
@@ -50,9 +51,57 @@ public:
   // funzione che restituisce la matrice dopo l'eliminazione di gauss
   // nota: la funzione restituisce una matrice float anche per le matrici di
   // interi
-  Matrix<float> gauss() {
-    Matrix<float> res(rows, cols);
-    res = toFloat();
+  Matrix<T> intGauss() {
+    Matrix<T> res(rows, cols);
+    res =*this;
+
+    for (int i = 0; i < rows - 1; i++) {
+
+      bool flag = true;
+      std::cout<<"res ii "<<res[i][i]<<" "<<i<<std::endl<<res;
+      if (res[i][i] == 0) {
+        // flag per vedere se c'è una riga dove res[l][i] non è nullo
+        flag = false;
+        for (int l = i; l < rows; l++) {
+          if (res[l][i] != 0) {
+            flag = true;
+
+            // scambio la riga l con la riga i
+            std::cout<<res;
+            std::swap(res[l], res[i]);
+            std::cout<<res;
+            // esco dal for e posso andare avanti
+            break;
+          }
+        }
+      }
+      // se res[i][i] ==0 e non ho trovato una riga da scambiare significa che
+      // tutta la colonna i è vuota dalla riga i in giù quindi salto l'indice
+      if (!flag)
+        continue;
+
+      for (int j = i + 1; j < rows; j++) {
+        if (res[j][i] % res[i][i] != 0)
+          for (int k = 0; k < cols; k++)
+            res[j][k] *= res[i][i];
+        // calcolo lambda dell'algoritmo di gauss per le righe i e j
+        T lambda = res[j][i] / res[i][i];
+
+        for (int k = i; k < cols; k++) {
+          res[j][k] -= lambda * res[i][k];
+        }
+      }
+    }
+    return res;
+  }
+
+  Matrix<T> gauss() {
+    if (std::is_same<T, int>::value) {
+      return intGauss();
+    }
+
+    Matrix<T> res(rows, cols);
+    res = *this;
 
     for (int i = 0; i < rows - 1; i++) {
 
@@ -91,7 +140,7 @@ public:
   // funzione che calcola il rango della matrice
   int getRank() {
     // Iniziamo usando l'eliminazione di gauss
-    Matrix<float> res = gauss();
+    Matrix<T> res = gauss();
     std::cout << "matrice res\n";
 
     // contiamo le righe non nulle
@@ -204,11 +253,11 @@ public:
     return sub;
   }
   // override della moltiplicazione scalare
-  friend Matrix<T> operator*(const Matrix<T> A, T b) {
-    Matrix res(A.rows, A.cols);
-    res.matrix = A.matrix;
-    for (int i = 0; i < A.rows; i++) {
-      for (int j = 0; j < A.cols; j++) {
+  Matrix<T> operator*(T b) {
+    Matrix res(rows, cols);
+    res.matrix = matrix;
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
         res[i][j] *= b;
       }
     }
@@ -218,7 +267,7 @@ public:
   // funzione che calcola l'inversa della matrice
   Matrix getInverse() {
     // se rows != cols non è invertibile
-    if (rows != cols) {
+    if (rows != cols || rows != getRank()) {
       // errore
       std::cout << "errore, matrice non quadrata";
     }
@@ -270,16 +319,15 @@ int main() {
       // m[i][j] = i + 1 + j;
     }
   }
-  std::cout << "matrice m: \n";
-  std::cout << m << std::endl;
 
-  // std::cout << m.getInverse();
-  // std::cout<<
-  // m.print();
+  std::cout << "matrice m: \n" << m << std::endl;
+
+  //std::cout << "matrice inversa: \n" << m.getInverse();
+
   std::cout << "matrice gauss: \n" << m.gauss();
-  // std::cout<<"determinante: "<<m.getDeterminant()<<"\n";
-  // std::cout<<"rango: "<<m.getRank()<<"\n";
-  // m.print();
-
+  //std::cout << "determinante: " << m.getDeterminant() << "\n";
+  //std::cout << "rango: " << m.getRank() << "\n";
   // std::cout << m.mult(m.getInverse());
+  //std::cout << "matrice gauss: \n" << m.gauss();
+  
 }
