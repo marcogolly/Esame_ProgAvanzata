@@ -19,33 +19,38 @@ public:
   // con il costruttore vogliamo definire la matrice fissando la dimensione
   // (r×c)
   Matrix(int r, int c) {
+
     rows = r;
     cols = c;
+    if (r == 0 || c == 0) {
+      throw std::invalid_argument("matrice vuota");
+    }
     // inizializzo la matrice (vuota) composta da r righe e c colonne. In
     // particolare ogni riga sarà un array di elementi
     matrix = std::vector<std::vector<T>>(r, std::vector<T>(c));
   }
 
-  Matrix(const Matrix& mat) {
+  Matrix(const Matrix &mat) {
+
     rows = mat.getRows();
     cols = mat.getCols();
+    if (rows == 0 || cols == 0) {
+      throw std::invalid_argument("matrix is empty");
+    }
     matrix = mat.matrix;
   }
 
   // funzione che restituisce il numero di righe (la variabile è privata quindi
   // non è visualizzabile altrimenti)
-  int getRows() const { return rows; }
+  const int getRows() const { return rows; }
 
   // funzione che restituisce il numero di colonne (la variabile è privata
   // quindi non è visualizzabile altrimenti)
-  int getCols() const { return cols; }
+  const int getCols() const { return cols; }
 
-  Matrix<T> gauss() {
-    if (std::is_integral<T>::value)
-      throw std::runtime_error("tipo non valido");
-
-    Matrix<T> res(rows, cols);
-    res = Matrix(*this);
+  const Matrix<T> gauss() {
+    
+    Matrix<T> res(*this);
 
     for (int i = 0; i < rows - 1; i++) {
 
@@ -57,11 +62,7 @@ public:
           if (res[l][i] != 0) {
             flag = true;
 
-            // scambio la riga l con la riga i, questo cambia il segno del determinante
-            //moltiplico la riga per -1 in modo tale da cambiare il segno al determinante
-            for (int col =0; col<cols; col++){
-              res[l][col] *=-1;
-            }
+            // scambio la riga l con la riga i
             std::swap(res[l], res[i]);
             // esco dal for e posso andare avanti
             break;
@@ -74,9 +75,23 @@ public:
         continue;
 
       for (int j = i + 1; j < rows; j++) {
+        // NOTA IMPORTANTE: per le matrici di interi calcoliamo comunque gauss,
+        // ma non può essere utilizzato per il calcolo del determinante
+        if (std::is_integral<T>::value) {
+          for (int k = 0; k < cols; k++) {
+            res[j][k] *= res[i][i];
+          }
+          
+          T mcd = res[j][0];
+          for (int k = 1; k < cols; k++) {
+            mcd = std::gcd(mcd, res[j][k]);
+          }
+          
+          for (int k = 1; k < cols; k++)
+            res[j][k] /= mcd;
+        }
         // calcolo lambda dell'algoritmo di gauss per le righe i e j
-        T lambda = res[j][i] / res[i][i];
-        
+        float lambda = res[j][i] / res[i][i];
         for (int k = i; k < cols; k++) {
           res[j][k] -= lambda * res[i][k];
         }
@@ -86,9 +101,9 @@ public:
   }
 
   // funzione che calcola il rango della matrice
-  int getRank() {
+  const int getRank() {
     // Iniziamo usando l'eliminazione di gauss
-    Matrix<T> res = gauss();
+    Matrix<T> res = Matrix(gauss());
 
     // contiamo le righe non nulle
     int rank = 0;
@@ -107,29 +122,61 @@ public:
     return rank;
   }
 
-  T getDeterminant() {
-    // Check if the matrix is square
+  const T getDeterminant() {
+    T det = 0;
+
     if (rows != cols) {
-      throw std::invalid_argument("matrice non quadrata");
-    }  
+      throw std::invalid_argument("La matrice non è quadrata");
+    } else {
+      // caso base: la matrice è 1x1
+      if (rows == 1) {
+        return matrix[0][0];
+      }
+      // caso base: la matrice è 2x2
+      if (rows == 2) {
+        return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+      }
+      // caso ricorsivo: calcola il determinante utilizzando il metodo di
+      // Laplace
+      else {
+        for (int i = 0; i < cols; i++) {
+          // calcolo il sottodeterminante utilizzando il metodo di Laplace sulla
+          // sottomatrice eliminando la riga 0 e la colonna i
+          Matrix<T> submatrix(rows - 1, cols - 1);
+          for (int j = 1; j < rows; j++) {
+            int submatrix_col = 0;
+            for (int k = 0; k < cols; k++) {
+              if (k == i)
+                continue;
+              submatrix[j - 1][submatrix_col] = matrix[j][k];
+              submatrix_col++;
+            }
+          }
+          T subdet = submatrix.getDeterminant();
 
-    // uso gauss
-    Matrix res = gauss();
-    // il determinante è uguale al prodotto dei pivot
-    T determinant = 1;
-    for (int i = 0; i < rows; i++) {
-      determinant *= res[i][i];
+          // aggiungo o sottraggo il sottodeterminante al risultato finale in
+          // base al segno dell'elemento corrente (i, 0)
+          if (i % 2 == 0) {
+            det += matrix[0][i] * subdet;
+          } else {
+            det -= matrix[0][i] * subdet;
+          }
+        }
+      }
     }
-
-    return determinant;
+    return det;
   }
 
   // moltiplicazione riga - colonna matrice matrice
-  Matrix<T> mult(const Matrix<T> &B) {
+  const Matrix<T> mult(const Matrix<T> &B) {
     Matrix<T> res = Matrix(rows, B.cols);
-
+    if (B.cols == 0 || B.rows == 0) {
+      throw std::invalid_argument("Matrice B nulla");
+    }
     if (cols != B.rows) {
-      throw std::invalid_argument("Errore: il numero di colonne della prima matrice deve essere uguale al numero di righe della seconda matrice");
+      throw std::invalid_argument(
+          "Errore: il numero di colonne della prima matrice deve essere uguale "
+          "al numero di righe della seconda matrice");
     } else {
       for (size_t i = 0; i < rows; ++i) {
         for (size_t j = 0; j < B.cols; ++j) {
@@ -143,11 +190,12 @@ public:
   }
 
   // moltiplicazione matrice - vettore colonna
-  std::vector<T> mult_vect(const std::vector<T> &b) {
+  const std::vector<T> mult_vect(const std::vector<T> &b) {
     std::vector<T> res(rows);
 
     if (cols != b.size()) {
-      std::invalid_argument("Errore: il numero di colonne della matrice deve essere uguale al numero di elementi del vettore");
+      std::invalid_argument("Errore: il numero di colonne della matrice deve "
+                            "essere uguale al numero di elementi del vettore");
     } else {
       for (size_t i = 0; i < rows; ++i) {
         for (size_t j = 0; j < cols; ++j) {
@@ -159,11 +207,13 @@ public:
   }
 
   // Funzione per aggiungere un vettore colonna alla matrice
-  void AddColumn(std::vector<T> &column) {
+  const void AddColumn(std::vector<T> &column) {
     // Verifica che il vettore abbia lo stesso numero di elementi delle righe
     // della matrice
     if (column.size() != rows) {
-      std::invalid_argument("Errore: il vettore colonna ha un numero di elementi diverso dal numero di righe della matrice.");
+      std::invalid_argument(
+          "Errore: il vettore colonna ha un numero di elementi diverso dal "
+          "numero di righe della matrice.");
     } else {
       // Incrementa il numero di colonne della matrice
       cols++;
@@ -189,12 +239,18 @@ public:
   // risoluzione sistema lineare Ax=b    (dim x = num col A)
 
   std::vector<T> system(std::vector<T> &b) {
+    if (std::is_integral<T>::value) {
+      throw std::invalid_argument(
+          "impossible risolvere il sistema lineare di interi");
+    }
     std::vector<T> x(cols);
 
     // Verifica che il numero di elementi di b sia uguale al numero di righe
     // della matrice
     if (b.size() != rows) {
-      throw std::invalid_argument("Errore: il vettore b deve avere lo stesso numero di elementi del numero di righe della matrice");
+      throw std::invalid_argument(
+          "Errore: il vettore b deve avere lo stesso numero di elementi del "
+          "numero di righe della matrice");
     }
 
     else {
@@ -204,12 +260,12 @@ public:
       orig.AddColumn(b);
       Matrix<T> res = orig.gauss();
       Matrix<T> S(rows, cols); // copio res in S
-      S=Matrix(res);
+      S = Matrix(res);
 
       std::vector<T> c = res.RemoveLastColumn(); // termini noti dopo gauss
 
       if (res.getDeterminant() == 0) {
-        throw std::runtime_error("le soluzioni non sono indipendenti");
+        throw std::invalid_argument("le soluzioni non sono indipendenti");
       }
 
       else {
@@ -227,6 +283,10 @@ public:
   }
 
   Matrix<T> inverse() {
+    if (std::is_integral<T>::value) {
+      throw std::invalid_argument(
+          "impossible calcolare l'inversa di una matrice di interi");
+    }
     Matrix<T> inv(rows, cols);
 
     // matrirce identità
@@ -327,35 +387,35 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &b) {
 int main() {
   srand(time(0)); // Seed per il random
 
-  Matrix<float> m(4, 4);
-  Matrix<float> m2(4, 4);
-  std::vector<float>v(4);
-  for (int i = 0; i < 4; i++) {
+  Matrix<int> m(10, 10);
+  Matrix<int> m2(10, 10);
+  std::vector<int> v(10);
+  for (int i = 0; i < 10; i++) {
     v[i] = rand() % 10 + 1;
-    for (int j = 0; j < 4; j++) {
+    for (int j = 0; j < 10; j++) {
       // se voglio inizializzare una matrice random
-      m[i][j] = rand() % 10 + 1;
-      m2[i][j] = rand() % 10 + 1;
+      m[i][j] = rand() % 100 + 1;
+      m2[i][j] = rand() % 100 + 1;
 
       // inizializzazione di prova
       // m[i][j] = i + 1 + j;
     }
   }
-  m[0][0] =0;
+  m[0][0] = 0;
   std::cout << "matrice m: \n" << m << std::endl;
-  std::cout<< "vettore v: " <<v<<std::endl;
+  std::cout << "vettore v: " << v << std::endl;
   try {
     std::cout << "matrice gauss: \n" << m.gauss();
     std::cout << "matrice inversa: \n" << m.inverse();
-    std::cout << "determinante: " << m.getDeterminant() << "\n";
+    // std::cout << "determinante: " << m.getDeterminant() << "\n";
     std::cout << "rango: " << m.getRank() << "\n";
-    //std::cout << m.mult(m);
+    // std::cout << m.mult(m);
     std::cout << "matrice gauss: \n" << m.gauss();
 
-  std::cout << "matrice m: \n" << m << std::endl;
+    std::cout << "matrice m: \n" << m << std::endl;
 
-    std::cout<<m.system(v);
-    
+    std::cout << m.system(v);
+
   } catch (std::exception &e) {
     std::cout << e.what();
   }
