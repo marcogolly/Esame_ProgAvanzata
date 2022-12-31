@@ -6,6 +6,11 @@
 #include <ostream>
 #include <vector>
 
+int mcd(int a, int b) {
+  if (b == 0) return a;
+  return mcd(b, a % b);
+}
+
 // Definizione della classe
 template <typename T> class Matrix {
 private:
@@ -82,13 +87,13 @@ public:
             res[j][k] *= res[i][i];
           }
           
-          T mcd = res[j][0];
+          T max_div = res[j][0];
           for (int k = 1; k < cols; k++) {
-            mcd = std::gcd(mcd, res[j][k]);
+            max_div = mcd(max_div, res[j][k]);
           }
           
           for (int k = 1; k < cols; k++)
-            res[j][k] /= mcd;
+            res[j][k] /= max_div;
         }
         // calcolo lambda dell'algoritmo di gauss per le righe i e j
         float lambda = res[j][i] / res[i][i];
