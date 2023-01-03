@@ -2,11 +2,11 @@
 #include <cmath>
 #include <exception>
 #include <iostream>
-#include <numeric>
 #include <ostream>
 #include <vector>
-#include <cstdlib>
 
+//funzione per calcolare il massimo comune divisore con l'algoritmo di euclide
+//un'alternativa è usare std::GCD(a,b) ma è supportata solo in C++17
 int mcd(int a, int b) {
   if (b == 0)
     return a;
@@ -36,13 +36,14 @@ public:
     // particolare ogni riga sarà un array di elementi
     matrix = std::vector<std::vector<T>>(r, std::vector<T>(c));
   }
-
+  // implementiamo un costruttore "copia" che consente di creare un nuovo oggetto 
+  // copiando gli attributi di quello passato come parametro
   Matrix(const Matrix &mat) {
 
     rows = mat.getRows();
     cols = mat.getCols();
     if (rows == 0 || cols == 0) {
-      throw std::invalid_argument("matrix is empty");
+      throw std::invalid_argument("matrice vuota");
     }
     matrix = mat.matrix;
   }
@@ -55,29 +56,38 @@ public:
   // quindi non è visualizzabile altrimenti)
   const int getCols() const { return cols; }
 
-  const Matrix<T> gauss() {
 
+  // funzione che applica alla matrice l'eliminazione di gauss
+
+  const Matrix<T> gauss() {
+    
+    // usiamo una copia della matrice in modo tale da non modificare l'originale
     Matrix<T> res(*this);
 
     for (int i = 0; i < rows - 1; i++) {
-
+      // flag serve a verificare la validità del pivot della riga i
+      //se è true è tutto a posto
       bool flag = true;
-      if (res[i][i] == 0) {
-        // flag per vedere se c'è una riga dove res[l][i] non è nullo
-        flag = false;
-        for (int l = i; l < rows; l++) {
-          if (res[l][i] != 0) {
-            flag = true;
 
-            // scambio la riga l con la riga i
-            std::swap(res[l], res[i]);
-            // esco dal for e posso andare avanti
+      //se il pivot è nullo devo controllare che tutti gli elementi della colonna i sotto di lui siano nulli
+      if (res[i][i] == 0) {
+        flag = false;
+
+        for (int j = i; j < rows; j++) {
+          
+          //se trovo una riga con un pivot valido, posso scambiare le righe i e j
+          //a questo punto posso proseguire normalmente
+          if (res[j][i] != 0) {
+            flag = true;
+            std::swap(res[j], res[i]);
+
+            //siccome ora il pivot non è nullo posso uscire dal ciclo
             break;
           }
         }
       }
       // se res[i][i] ==0 e non ho trovato una riga da scambiare significa che
-      // tutta la colonna i è vuota dalla riga i in giù quindi salto l'indice
+      // dalla riga i in giù, tutta la colonna i è vuota, quindi passo alla riga i+1
       if (!flag)
         continue;
 
@@ -85,47 +95,55 @@ public:
         // NOTA IMPORTANTE: per le matrici di interi calcoliamo comunque gauss,
         // ma non può essere utilizzato per il calcolo del determinante
 
+        // nel caso delle matrici intere moltiplico la riga j per il pivot (per questo però non si potrà calcolare il determinante)
+        // in modo tale da poter sottrarre alla riga j un multiplo della riga i garantendo di usare solo numeri interi
         if (std::is_integral<T>::value) {
+          
+          //k è l'indice della colonna
           for (int k = 0; k < cols; k++) {
+            // questo algoritmo però spesso va in overflow anche senza usare numeri enormi, questo è inevitabile in alcuni casi
+            // siccome c++ non gestisce gli overflow nelle operazioni tra interi, dobbiamo farlo manualmente
             T max =std::numeric_limits<T>::max()/res[i][i];
             if (max <0)
               max = -max;
             
             if (res[j][k]> max){
-              std::cout<<"questo "<<res[j][k]<<" è maggiore di "<<max<<std::endl;
+              //se vado in overflow alzo un'eccezione
               throw std::overflow_error("Errore: impossible utilizzare gauss con questa matrice, valori troppo grandi. Prova a convertire in un tipo più grande (ad esempio longint) oppure in float");
             }
+
             res[j][k] *= res[i][i];
           }
         }
 
-        //std::cout << "begin " << res << std::endl;
         // calcolo lambda dell'algoritmo di gauss per le righe i e j
         float lambda = res[j][i] / res[i][i];
-        //std::cout << "lambda: " << lambda << "riga j: " << j << " riga i " << i
-                  //<< std::endl;
 
+        //procediamo con l'eliminazione
         for (int k = i; k < cols; k++) {
           res[j][k] -= lambda * res[i][k];
         }
-        //std::cout << "end " << res << std::endl;
 
-        //semplifichiamo la riga j se possibile. QUESTO PASSAGGIO NON PERMETTE IL CALCOLO DEL DETERMINANTE
+        //per le matrici di interi, semplifichiamo la riga j se possibile
         if (std::is_integral<T>::value) {
+
+          //trovo il massimo comune divisore
           T max_div = res[j][0];
           for (int k = 1; k < cols; k++) {
             max_div = mcd(max_div, res[j][k]);
           }
+
           //nel caso di righe nulle max_div è 0, in quel caso lo poniamo =1
           if (max_div ==0)  
             max_div =1;
-          
+          //semplifico la riga
           for (int k = 1; k < cols; k++)
             res[j][k] /= max_div;
 
         }
       }
     }
+    //ritorno la matrice res
     return res;
   }
 
