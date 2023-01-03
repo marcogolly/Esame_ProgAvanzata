@@ -5,9 +5,11 @@
 #include <numeric>
 #include <ostream>
 #include <vector>
+#include <cstdlib>
 
 int mcd(int a, int b) {
-  if (b == 0) return a;
+  if (b == 0)
+    return a;
   return mcd(b, a % b);
 }
 
@@ -54,7 +56,7 @@ public:
   const int getCols() const { return cols; }
 
   const Matrix<T> gauss() {
-    
+
     Matrix<T> res(*this);
 
     for (int i = 0; i < rows - 1; i++) {
@@ -82,23 +84,45 @@ public:
       for (int j = i + 1; j < rows; j++) {
         // NOTA IMPORTANTE: per le matrici di interi calcoliamo comunque gauss,
         // ma non può essere utilizzato per il calcolo del determinante
+
         if (std::is_integral<T>::value) {
           for (int k = 0; k < cols; k++) {
+            T max =std::numeric_limits<T>::max()/res[i][i];
+            if (max <0)
+              max = -max;
+            
+            if (res[j][k]> max){
+              std::cout<<"questo "<<res[j][k]<<" è maggiore di "<<max<<std::endl;
+              throw std::overflow_error("Errore: impossible utilizzare gauss con questa matrice, valori troppo grandi. Prova a convertire in un tipo più grande (ad esempio longint) oppure in float");
+            }
             res[j][k] *= res[i][i];
           }
-          
+        }
+
+        //std::cout << "begin " << res << std::endl;
+        // calcolo lambda dell'algoritmo di gauss per le righe i e j
+        float lambda = res[j][i] / res[i][i];
+        //std::cout << "lambda: " << lambda << "riga j: " << j << " riga i " << i
+                  //<< std::endl;
+
+        for (int k = i; k < cols; k++) {
+          res[j][k] -= lambda * res[i][k];
+        }
+        //std::cout << "end " << res << std::endl;
+
+        //semplifichiamo la riga j se possibile. QUESTO PASSAGGIO NON PERMETTE IL CALCOLO DEL DETERMINANTE
+        if (std::is_integral<T>::value) {
           T max_div = res[j][0];
           for (int k = 1; k < cols; k++) {
             max_div = mcd(max_div, res[j][k]);
           }
+          //nel caso di righe nulle max_div è 0, in quel caso lo poniamo =1
+          if (max_div ==0)  
+            max_div =1;
           
           for (int k = 1; k < cols; k++)
             res[j][k] /= max_div;
-        }
-        // calcolo lambda dell'algoritmo di gauss per le righe i e j
-        float lambda = res[j][i] / res[i][i];
-        for (int k = i; k < cols; k++) {
-          res[j][k] -= lambda * res[i][k];
+
         }
       }
     }
@@ -391,13 +415,13 @@ std::ostream &operator<<(std::ostream &os, const std::vector<T> &b) {
 
 int main() {
   srand(time(0)); // Seed per il random
-
-  Matrix<int> m(10, 10);
-  Matrix<int> m2(10, 10);
-  std::vector<int> v(10);
-  for (int i = 0; i < 10; i++) {
-    v[i] = rand() % 10 + 1;
-    for (int j = 0; j < 10; j++) {
+  int n = 15;
+  Matrix<int> m(n, n);
+  Matrix<int> m2(n, n);
+  std::vector<int> v(n);
+  for (int i = 0; i < n; i++) {
+    v[i] = rand() % n + 1;
+    for (int j = 0; j < n; j++) {
       // se voglio inizializzare una matrice random
       m[i][j] = rand() % 100 + 1;
       m2[i][j] = rand() % 100 + 1;
