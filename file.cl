@@ -10,7 +10,8 @@ void MCD(const int a, const int b, __global int* result) {
 }
 
 //kernel gauss 
-__kernel void gauss(__global Matrix<T>* res) {
+__kernel 
+void gauss(__global Matrix<T>* res) {
     int pivot_col = 0;
     for (int pivot_row = 0; pivot_col < rows - 1; ++pivot_row) {
         // flag serve a verificare la validità del pivot
@@ -95,7 +96,8 @@ __kernel void gauss(__global Matrix<T>* res) {
 
 
 //determino il rango di una matrice usando Gauss
-__kernel void rank(__global float* A, int rows, int cols, __global int* rank) {
+__kernel 
+void rank(__global float* A, int rows, int cols, __global int* rank) {
   int row = get_global_id(0);
 
   // esegui l'eliminazione di Gauss sulla riga corrente
@@ -130,7 +132,7 @@ __kernel void rank(__global float* A, int rows, int cols, __global int* rank) {
   }
 }
 
-
+//kernel per il determiante 
 __kernel 
 void determinant(__global float* A, int rows, int cols, __global float* determinant) {
   int row = get_global_id(0);
