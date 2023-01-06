@@ -174,15 +174,15 @@ public:
     /**
      * @param A è la prima matrice
      * @param B è il vettore
-     * @param R è il numero di righe di A
-     * @param C è il numero di colonne di A
+     * @param rows è il numero di righe di A
+     * @param cols è il numero di colonne di A
      * @param M è la dimensione di B
      */
     void compute(const float* A, const float* B, 
-		 const unsigned int R, const unsigned int C, const unsigned int M)
+		 const unsigned int rows, const unsigned int cols, const unsigned int M)
     {
         // preparo i buffer
-        const unsigned int datasize_A = R*C*sizeof(float);
+        const unsigned int datasize_A = rows*cols*sizeof(float);
         const unsigned int datasize_B = M*sizeof(float);
         
         const auto input_flags = CL_MEM_READ_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR;
@@ -195,15 +195,15 @@ public:
         cl::Kernel kernel(program, kernel_name.c_str());
         kernel.setArg(0, aBuf);
         kernel.setArg(1, bBuf);
-        kernel.setArg(2, R);
-        kernel.setArg(3, C);
+        kernel.setArg(2, rows);
+        kernel.setArg(3, cols);
         kernel.setArg(4, M);
 
         // creo una coda di comandi
         cl::CommandQueue queue(context, device);
 
         // sottometto il kernel
-        enqueue_kernel(queue, kernel, cl::NDRange(R, M));
+        enqueue_kernel(queue, kernel, cl::NDRange(rows, M));
 
         // A
         queue.enqueueReadBuffer(aBuf, CL_TRUE, 0, datasize_A, A);
