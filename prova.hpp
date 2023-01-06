@@ -8,6 +8,209 @@
 #include <ostream>
 #include <vector>
 
+#define CL_HPP_TARGET_OPENCL_VERSION 120
+#define CL_HPP_MINIMUM_OPENCL_VERSION 120
+
+#include <CL/opencl.hpp> //per binding C++ di OpenCL
+
+
+/*-------------------------------------- VERSIONE DI RISERVA -------------------------------------
+
+
+//scrivo la classe per selezionare il dispositivo sul quale vogliamo
+//mandare in esecuzione qaulcosa e compilare il programma
+class OpenCLProcessor{
+protected:    
+    cl::Program program;
+    cl::Device device;
+    cl::Contex context; 
+public:
+    OpenCLProcessor(){
+        //dovrà trovare tutte le piattaforme disponibili sulla macchina 
+        //in cui sto cercando di istanziare un oggetto di questo tipo
+            std::vector<cl::Platform> platforms;//vettore delle piattaforme 
+            cl::Platform::get(&platforms);//per interrogare il sistema 
+            //per sapere quali sono le piattaforme disponibili
+            if(platforms.empty()){
+                //se non ci sono piattaforme lancio un eccezione
+                throw std::runtime_error("Nessuna piattaforma OpenCL disponibile!");
+            }
+            //se il vettore contiene almeno un elemento allora quel elemento 
+            //è una piattaforma disponibile sulla mia macchina
+            //mi chieod quali sono i dispositivi disponibili su quella piattaforma
+            std::vector<cl::Device> devices;
+            platforms[0].getDevices(CL_DEVICE_TYPE_ALL, &devices);
+
+            if(devices.empty()){
+                //se non ci sono device lancio un eccezione
+                throw std::runtime_error("Nessun dispositivo OpenCL disponibile nella piattaforma!");
+            }
+            device = devices[0];
+
+            context = cl::Context(device); 
+    }   
+    //costruisco un metodo che ci consente di caricare un programma all'interno del membro
+    void build_program(const std::string kernel_source){
+        //carico il sorgente
+        cl::Program::Sources sources{kernel_source};
+        //carico il programma
+        program= cl::Program(context, sources);
+        if (program.build() != CL_BUILD_SUCCES){
+            std::ostringstream oss;
+
+            oss<<program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
+            throw std::runtime_error(oss.str());
+        }
+    }
+
+};
+
+//scrivo una funzione che servirà per caricare da un file il sorgente del kernell
+std::string load_content(const std::string filename)
+{
+    //classe per leggere i file di output
+    std::ifstream file(filename);
+    std::string constent(std::istreambuf_iterator<char>(file), //iteratore inizio file
+                        (std::istreambuf_iterator<char>()));
+    return content;                    
+
+} 
+
+//scrivo la classe che caricherà il kernel e i suoi parametri
+class ParallelMatrix : public OpenCLProcessor{
+public:
+    //costruttore classe
+    ParallelMatrixMult() : OpenCLProcessor()
+    {
+        auto kernel_source = load_content("file.cl");
+        build_program(kernel_source);
+    }
+        
+}*/
+
+
+/*-------------------------------- VERSIONE TIPO PROF --------------------------------*/
+
+class Matrix : public OpenCLProcessor {
+protected:
+    std::string kernel_name;   //!< nome della funzione del kernel
+
+    /**
+     * @brief Accoda il kernel 
+     * 
+     * @param queue è una coda di comandi
+     * @param kernel è il kernel da accodare
+     * @param work_item_size è il numero dei work-item da attivare
+     */
+    virtual void enqueue_kernel(cl::CommandQueue& queue, cl::Kernel& kernel, 
+                                const cl::NDRange& work_item_size) {
+        // sottometto il kernel
+        queue.enqueueNDRangeKernel(kernel, cl::NullRange, work_item_size);
+    }
+
+public:
+    /**
+     * @brief Costruttori
+     */
+    
+    MCD(): OpenCLProcessor(), kernel_name("MCD")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    Gauss(): OpenCLProcessor(), kernel_name("gauss")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    Rank(): OpenCLProcessor(), kernel_name("rank")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    Det(): OpenCLProcessor(), kernel_name("determinant")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    Molt(): OpenCLProcessor(), kernel_name("molt")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    Mult(): OpenCLProcessor(), kernel_name("mult")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    LinearSis(): OpenCLProcessor(), kernel_name("linear_sistem")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    InvMatrix(): OpenCLProcessor(), kernel_name("invert_matrix")
+    {
+        auto kernel_source = load_file("file.cl");
+	    build_program(kernel_source);
+    }
+
+    /**
+     * @brief Nome della classe
+     * 
+     * @return il nome della classe
+     */
+    static std::string name()
+    {
+        return "Matrix";
+    }
+
+    /**
+     * @param A è la prima matrice
+     * @param B è il vettore
+     * @param R è il numero di righe di A
+     * @param C è il numero di colonne di A
+     * @param M è la dimensione di B
+     */
+    void compute(const float* A, const float* B, 
+		 const unsigned int R, const unsigned int C, const unsigned int M)
+    {
+        // preparo i buffer
+        const unsigned int datasize_A = R*C*sizeof(float);
+        const unsigned int datasize_B = M*sizeof(float);
+        
+        const auto input_flags = CL_MEM_READ_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR;
+        const auto output_flags = CL_MEM_READ_WRITE | CL_MEM_HOST_READ_ONLY;
+
+        cl::Buffer aBuf(context, input_flags, datasize_A, const_cast<float *>(A));
+        cl::Buffer bBuf(context, input_flags, datasize_B, const_cast<float *>(B));
+
+        // preparo il kernel e i suo parametri attuali
+        cl::Kernel kernel(program, kernel_name.c_str());
+        kernel.setArg(0, aBuf);
+        kernel.setArg(1, bBuf);
+        kernel.setArg(2, R);
+        kernel.setArg(3, C);
+        kernel.setArg(4, M);
+
+        // creo una coda di comandi
+        cl::CommandQueue queue(context, device);
+
+        // sottometto il kernel
+        enqueue_kernel(queue, kernel, cl::NDRange(R, M));
+
+        // A
+        queue.enqueueReadBuffer(aBuf, CL_TRUE, 0, datasize_A, A);
+    }
+};
+
+/*-----------------------------------------C++----------------------------------------------------------------*/
 
 /**
  * @brief Calcola il massimo comun divisore tra due numeri interi con l'algortimo di Euclide
