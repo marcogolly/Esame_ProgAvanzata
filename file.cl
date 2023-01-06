@@ -10,9 +10,7 @@ void MCD(const int a, const int b, __global int* result) {
 }
 
 //kernel gauss 
-
-__kernel 
-void gauss(__global Matrix<T>* res) {
+__kernel void gauss(__global Matrix<T>* res) {
     int pivot_col = 0;
     for (int pivot_row = 0; pivot_col < rows - 1; ++pivot_row) {
         // flag serve a verificare la validità del pivot
@@ -87,51 +85,17 @@ void gauss(__global Matrix<T>* res) {
                 }
             }
         }
+      }
+    }  
+  }
+}  
+} 
 
-
-
-
-
-
-
-__kernel
-void getRankKernel(__global T* matrix, uint rows, uint cols, __global int* rank) {
-    // Alloco lo spazio per l'oggetto della classe Matrix sulla GPU
-    Matrix<T> m = (Matrix<T>*)malloc(sizeof(Matrix<T>));
-    m->rows = rows;
-    m->cols = cols;
-    m->matrix = matrix;
-
-    // Eseguo il metodo gauss sulla GPU
-    Matrix<T> res = m->gauss();
-
-    // Contiamo le righe non nulle
-    int r = 0;
-    for (uint i=0; i<rows; ++i) {
-        bool null_row = true;
-        for (uint j=0; j<cols; ++j) {
-            if (res[i][j] != 0) {
-                null_row = false;
-                break;
-            }
-        }
-        if (!null_row) {
-            r++;
-        }
-    }
-
-    // Scriviamo il risultato nella variabile di output rank
-    *rank = r;
-
-    // Liberiamo lo spazio allocato per l'oggetto della classe Matrix sulla GPU
-    free(m);
-}
 
 
 
 //determino il rango di una matrice usando Gauss
-__kernel
-void rank(__global float* A, int rows, int cols, __global int* rank) {
+__kernel void rank(__global float* A, int rows, int cols, __global int* rank) {
   int row = get_global_id(0);
 
   // esegui l'eliminazione di Gauss sulla riga corrente
@@ -166,31 +130,6 @@ void rank(__global float* A, int rows, int cols, __global int* rank) {
   }
 }
 
-__kernel 
-void determinantKernel(__global T* matrix, uint rows, uint cols, __global T* determinant) {
-    // Alloco lo spazio per l'oggetto della classe Matrix sulla GPU
-    Matrix<T> m = (Matrix<T>*)malloc(sizeof(Matrix<T>));
-    m->rows = rows;
-    m->cols = cols;
-    m->matrix = matrix;
-
-    // Eseguo il metodo gauss sulla GPU
-    Matrix<T> res = m->gauss();
-
-    // Calcolo il determinante moltiplicando gli elementi sulla diagonale principale
-    T d = 1;
-    for (uint i=0; i<rows; ++i) {
-        d *= res[i][i];
-    }
-
-    // Scriviamo il risultato nella variabile di output determinant
-    *determinant = d;
-
-    // Liberiamo lo spazio allocato per l'oggetto della classe Matrix sulla GPU
-    free(m);
-}
-
-
 
 __kernel 
 void determinant(__global float* A, int rows, int cols, __global float* determinant) {
@@ -212,6 +151,7 @@ void determinant(__global float* A, int rows, int cols, __global float* determin
         }
       }
     }
+    
 
     // calcola lambda dell'algoritmo di Gauss per le righe row e i
     float lambda = A[row * cols + i] / A[i * cols + i];
@@ -219,7 +159,9 @@ void determinant(__global float* A, int rows, int cols, __global float* determin
     // sottrai lambda * riga i dalla riga row
     for (int j = i; j < cols; j++) {
       A[row * cols + j]
-
+    }
+  }
+}   
 
 //kernel moltiplicazione tra vettore e colonna
 __kernel
@@ -247,79 +189,6 @@ void mult(__global float* A, __global float* x, __global float* y,
   y[row] = res;
 }
 
-
-//sistema lineare
-__kernel 
-void solveKernel(__global T* matrix, uint rows, uint cols, __global T* b, __global T* x) {
-    // Alloco lo spazio per l'oggetto della classe Matrix sulla GPU
-    Matrix<T> m = (Matrix<T>*)malloc(sizeof(Matrix<T>));
-    m->rows = rows;
-    m->cols = cols;
-    m->matrix = matrix;
-
-    // Eseguo il metodo gauss sulla GPU
-    Matrix<T> res = m->gauss();
-
-    // Risolvo il sistema lineare Ax=b partendo dalle equazioni più semplici (cioè quelle con un solo incognita)
-    for (int i=rows-1; i>=0; --i) {
-        x[i] = b[i];
-        for (int j=i+1; j<cols; ++j) {
-            x[i] -= res[i][j] * x[j];
-        }
-        x[i] /= res[i][i];
-    }
-
-    // Liberiamo lo spazio allocato per l'oggetto della classe Matrix sulla GPU
-    free(m);
-}
-
-
-//calcolo matrice inversa
-__kernel 
-void inverseKernel(__global T* matrix, uint rows, uint cols, __global T* inverse) {
-    // Alloco lo spazio per l'oggetto della classe Matrix sulla GPU
-    Matrix<T> m = (Matrix<T>*)malloc(sizeof(Matrix<T>));
-    m->rows = rows;
-    m->cols = cols;
-    m->matrix = matrix;
-
-    // Eseguo il metodo gauss sulla GPU
-    Matrix<T> res = m->gauss();
-
-    // Inizializzo l'inversa della matrice con la matrice identità
-    for (int i=0; i<rows; ++i) {
-        for (int j=0; j<cols; ++j) {
-            if (i == j) {
-                inverse[i*cols + j] = 1;
-            } else {
-                inverse[i*cols + j] = 0;
-            }
-        }
-    }
-
-    // Calcolo l'inversa della matrice partendo dalle equazioni più semplici (cioè quelle con un solo incognita)
-    for (int i=rows-1; i>=0; --i) {
-        for (int j=0; j<rows; ++j) {
-            if (i != j) {
-                T lambda = res[j][i] / res[i][i];
-                for (int k=0; k<cols; ++k) {
-                    inverse[j*cols + k] -= lambda * inverse[i*cols + k];
-                }
-            }
-        }
-    }
-
-    // Divido ogni riga dell'inversa per il coefficiente di corrispondenza nella matrice triangolare superiore
-    for (int i=0; i<rows; ++i) {
-        T lambda = res[i][i];
-        for (int j=0; j<cols; ++j) {
-            inverse[i*cols + j] /= lambda;
-        }
-    }
-
-    // Liberiamo lo spazio allocato per l'oggetto della classe Matrix sulla GPU
-    free(m);
-}
 
 //kernel per il sistema lineare
 
