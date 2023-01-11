@@ -1,59 +1,51 @@
-void AddColumn(__global float* A, __global float* column,  
-               unsigned int rows, unsigned int cols) 
-{
-  int i = get_global_id(0);
-  A[i * (cols+1) + cols] = column[i];
-  cols += 1;
-}
-
-
-void gauss(__global float* A, unsigned int rows, unsigned int cols) 
-{
-  int pivot_row = get_global_id(0);
-  int pivot_col = get_global_id(1);
-
-  if (pivot_row >= rows || pivot_col >= cols) {
-    return;
-  }
-
-  // Scegli il pivot di questa riga
-  for (int i = pivot_col + 1; i < cols; i++) {
-    if (fabs(A[pivot_row * cols + i]) > fabs(A[pivot_row * cols + pivot_col])) {
-      pivot_col = i;
-    }
-  }
-
-  // Scambia questa riga con la riga che contiene il pivot più grande
-  if (pivot_col != pivot_row) {
-    for (int i = 0; i < cols; i++) {
-      float temp = A[pivot_row * cols + i];
-      A[pivot_row * cols + i] = A[pivot_col * cols + i];
-      A[pivot_col * cols + i] = temp;
-    }
-  }
-
-  // Rendi zero gli elementi sottostanti il pivot
-  for (int i = pivot_row + 1; i < rows; i++) {
-    float lambda = A[i * cols + pivot_col] / A[pivot_row * cols + pivot_col];
-    for (int j = 0; j < cols; j++) {
-      A[i * cols + j] -= lambda * A[pivot_row * cols + j];
-    }
-  }
-}
-
 
 __kernel 
 void rank(__global float* A, const unsigned int rows, 
           const unsigned int cols, __global int* rank) 
 {
-  int i = get_global_id(0);
-  int j = get_global_id(1);
+    int i = get_global_id(0);
+    int j = get_global_id(1);
 
-  gauss(A,rows,cols);
-
-  if (A[i*cols + j] != 0) {
-    *rank += 1;
-  }
+    int pivot = i;
+    for (int k = i+1; k < rows; k++) {
+        if (A[k * cols + j] > A[pivot * cols + j]) {
+            pivot = k;
+        }
+    }
+    if (A[pivot * cols + j] != 0) {
+        if (i != pivot) {
+            for (int k = 0; k < cols; k++) {
+                float tmp = A[i * cols + k];
+                A[i * cols + k] = A[pivot * cols + k];
+                A[pivot * cols + k] = tmp;
+            }
+        }
+        float pivot_val = A[i * cols + j];
+        for (int k = j; k < cols; k++) {
+            A[i * cols + k] /= pivot_val;
+        }
+        for (int k = i+1; k < rows; k++) {
+            float factor = A[k * cols + j];
+            for (int l = j; l < cols; l++) {
+                A[k * cols + l] -= A[i * cols + l] * factor;
+            }
+        }
+    }
+    // Count number of non-zero rows
+    if (i == 0 && j == cols - 1) {
+        int r = 0;
+        for (int k = 0; k < rows; k++) {
+            int nonZero = 0;
+            for (int l = 0; l < cols; l++) {
+                if (A[k * cols + l] != 0) {
+                    nonZero = 1;
+                    break;
+                }
+            }
+            r += nonZero;
+        }
+        *rank = r;
+    }
 }
 
 
@@ -61,50 +53,46 @@ void rank(__global float* A, const unsigned int rows,
 __kernel 
 void determinant(__global float* A, const unsigned int rows, 
                  const unsigned int cols, __global float* determinant) 
-{
-    int i = get_global_id(0);
-    int j = get_global_id(1);
-    int pivot_col = 0;
-    int pivot_row = 0;
-    float result = 1.0;
+{   
+    int row = get_global_id(0);
+    int col = get_global_id(1);
 
-    for (pivot_row = 0; pivot_col < cols-1; ++pivot_row) {
-        // trova il massimo pivot
-        int max_row = pivot_row;
-        for (i = pivot_row+1; i < rows; ++i) {
-            if (fabs(A[i * rows + pivot_col]) > fabs(A[max_row * rows + pivot_col])) {
-                max_row = i;
+    int N=rows;
+    *determinant = 1.0f;
+
+    for (int i = 0; i < N; i++) {
+        int pivot = i;
+
+        for (int j = i + 1; j < N; j++) {
+            if (row == j && A[j * N + col] > A[pivot * N + col]) {
+                pivot = j;
             }
         }
-        //se trovo una riga con un pivot valido, posso scambiare le righe pivot_row e max_row
-        if (max_row != pivot_row) {
-            for (j = pivot_col; j < cols; ++j) {
-                float temp = A[pivot_row * rows + j];
-                A[pivot_row * rows + j] = A[max_row * rows + j];
-                A[max_row * rows + j] = temp;
+
+        if (row == i) {
+            if (pivot != i) {
+                *determinant *= -1.0f;
+                for (int j = 0; j < N; j++) {
+                    float temp = A[i * N + j];
+                    A[i * N + j] = A[pivot * N + j];
+                    A[pivot * N + j] = temp;
+                }
             }
-            result = -result;
-        }
-        // procediamo con l'eliminazione
-        float pivot = A[pivot_row * rows + pivot_col];
-        for (i = pivot_row + 1; i < rows; i++) {
-            float lambda = A[i * rows + pivot_col] / pivot;
-            for (j = pivot_col; j < cols; j++) {
-                A[i * rows + j] = A[i * rows + j] - lambda * A[pivot_row * rows + j];
+            for (int j = i + 1; j < N; j++) {
+                float mult = A[j * N + col] / A[i * N + col];
+                for (int k = col; k < N; k++) {
+                    A[j * N + k] -= mult * A[i * N + k];
+                }
             }
         }
-        pivot_col++;
     }
 
-    //calcoliamo il determinante come prodotto dei diagonal principal
-    for(i = 0; i < rows; i++)
-    {
-        result *= A[i * rows + i];
+    if (row == 0 && col == 0) {
+        for (int i = 0; i < N; i++) {
+            *determinant *= A[i * N + i];
+        }
     }
-
-    *determinant = result;
-
-}   
+}
 
 
 
@@ -144,18 +132,34 @@ void mult_vect(__global const float *A, __global const float *b, __global float 
 __kernel
 void system(__global float* A, __global float* b, __global float* x, unsigned int rows, unsigned int cols)
 {
-  int row = get_global_id(0);
-  int col = get_global_id(1); 
+    int i = get_global_id(0);
+    int j = get_global_id(1);
 
-  AddColumn(A, b, rows, cols);
+    if (i < rows && j < cols) {
+        // Controlla che il pivot scelto non sia nullo
+        if (A[j * cols + j] != 0) {
+            for (int k = i + 1; k < rows; k++) {
+                // Calcola il fattore per la riga corrente
+                float factor = A[k * cols + j] / A[j * cols + j];
+                for (int l = j; l <= cols; l++) {
+                    // Sottrai il fattore moltiplicato per la riga pivot dalla riga corrente
+                    A[k * cols + l] = A[k * cols + l] - factor * A[j * cols + l];
+                }
+                b[k] = b[k] - factor * b[j];
+            }
+        }
+    }
 
-  gauss(A, rows, cols);  
-  
-  float sum = 0;
-  for (int j = row + 1; j < cols - 1; j++) {
-    sum += A[row * cols + j] * x[j];
-  }
-  x[row] = ((row*cols + (cols-1)) - sum) / A[row*cols + col];    
+    if (j == cols-1){
+        for(int k=rows-1; k>=0; k--) {
+            float sum = 0;
+            for(int l=k+1; l<cols; l++) {
+                sum += A[k * rows + l] * x[l];
+            }
+            x[k] = (b[k] - sum) / A[k * rows + k];
+        }
+    }
+
 }
 
               
@@ -163,39 +167,46 @@ void system(__global float* A, __global float* b, __global float* x, unsigned in
 __kernel 
 void inverse(__global float* A, __global float* inv, unsigned int N) 
 {
-  int row = get_global_id(0);
-  int col = get_global_id(1);
+  
+    int i, j, k;
+    float pivot, factor;
+    int row = get_global_id(0);
+    int col = get_global_id(1);
 
-  __global float* id;
-  if (row == col) {
-    id[row*N + col] = 1.0f;
-  } else {
-    id[row*N + col] = 0.0f;
-  }
+    // initialize Ainv to identity matrix
+    if (row == col)
+        inv[row * N + col] = 1.0f;
+    else
+        inv[row * N + col] = 0.0f;
 
-  __global float* B;
-  B[row*(2*N) + col] = A[row*N + col];
-  B[row*(2*N) + col + N] = id[row*N + col];
-
-  gauss(B, N, 2*N);
-
-  if (row<N && col<row) {
-    double factor = B[col*N + row] / B[row*N + row];
-    for (uint k=0; k<2*N; ++k) {
-      B[col*N + k] -= B[row*N + k] * factor;
+    // forward elimination
+    for (i = 0; i < N; i++) {
+        if (i == row) {
+            pivot = A[row * N + i];
+            for (j = i + 1; j < N; j++) {
+                if (j == col) {
+                    factor = A[j * N + i] / pivot;
+                    for (k = i; k < N; k++) {
+                        A[j * N + k] -= factor * A[i * N + k];
+                    }
+                    for (k = 0; k < N; k++) {
+                        inv[j * N + k] -= factor * inv[i * N + k];
+                    }
+                }
+            }
+        }
     }
-  }
 
-  if (row<N) {
-    double factor = 1.0 / B[row*N + row];
-    for (uint j=0; j<2*N; ++j) {
-      B[row*N + j] *= factor;
+    // backward substitution
+    if (row == col) {
+        for (j = 0; j < N; j++) {
+            for (k = i + 1; k < N; k++) {
+                inv[row * N + j] -= A[row * N + k] * inv[k * N + j];
+            }
+            inv[row * N + j] /= A[row * N + i];
+        }
     }
-  }
-
-  if (row<N && col<N) {
-    inv[row*N + col] = B[row*N + col+N];
-  }
+  
 }    
 
     
