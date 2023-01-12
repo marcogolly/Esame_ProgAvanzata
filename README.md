@@ -11,6 +11,9 @@ Vattolo Carlotta
 
 
 cosa fa il rpogetto, cosa fa il main
+## Il Progetto
+Il progetto riguarda l'implementazione di una classe Matrix per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
+* 
 
 elenco file con breve descrizione
 
