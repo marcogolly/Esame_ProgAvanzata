@@ -229,14 +229,16 @@ void inverse(__global float* A, __global float* inv, unsigned int rows, unsigned
 
     // Creiamo una matrice estesa A|I
     for(int i=0; i<N; ++i) {
-        if(i == row) {
-            for(int j=0; j<N; ++j) {
-                completa[i * N + j] = A[i * N + j];
-                if (j == col) {
-                    completa[i * N + j + N] = 1;
-                } else {
-                    completa[i * N + j + N] = 0;
-                }
+        // prima metà della matrice completa è uguale a A
+        for(int j=0; j<N; ++j) {
+            completa[row * 2*N + j] = A[row * N + j]; 
+        }
+        //seconda metà della matrice completa è la matrice identità
+        for(int j=N; j<2*N; ++j) {
+            if (j-N == i) {
+                completa[row * 2*N + j] = 1; 
+            } else {
+                completa[row * 2*N + j] = 0;
             }
         }
     }
