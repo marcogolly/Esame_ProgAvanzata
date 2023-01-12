@@ -12,6 +12,8 @@ Vattolo Carlotta
 
 cosa fa il rpogetto, cosa fa il main
 
+elenco file con breve descrizione
+
 requisiti, versione oepncl verisone c++
 
 come si compila (comandi)
