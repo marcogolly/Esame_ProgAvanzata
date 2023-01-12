@@ -21,3 +21,5 @@ come si compila (comandi)
 come si runna il main
 
 piccol esposizione dei risultati sui garfici
+
+c++ da 10x10 in poi molto lento con det, system, inverse
