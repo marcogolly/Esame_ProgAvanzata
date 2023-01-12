@@ -299,11 +299,11 @@ void inverse(__global float* A, __global float* inv, unsigned int rows, unsigned
     barrier(CLK_GLOBAL_MEM_FENCE);
 
     // salva solo la parte destra della matrice completa A|I nella matrice inv
-    for(int i=0; i<N; ++i) {
-        for(int j=N; j<N*2; j++) {
-            inv[i * N + j - N] = completa[i * N + j];
-        }
+    for(int j=N; j<N*2; j++) {
+        inv[row * N + j - N] = completa[row * N + j];
     }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
 
