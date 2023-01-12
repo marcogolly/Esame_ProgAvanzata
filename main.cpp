@@ -130,7 +130,7 @@ int main()
 {
     
     srand(time(0)); 
-    int N = 7;
+    int N = 10;
     Matrix<float> A(N, N),  B(N, N);
     std::vector<float> b(N);
     for (int i=0; i<N; ++i) {
