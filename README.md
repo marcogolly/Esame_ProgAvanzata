@@ -6,7 +6,20 @@ Vattolo Carlotta
 
 ## Il Progetto
 Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
-* gauss()
+* *getRank* per il calcolo del rango della matrice utilizzando il metodo di Gauss
+* *getDeterminant* per il calcolo del determinante utilizzando il metodo di Laplace
+* *mult_matrix* per calcolare la moltiplocazione righe-colonne di due matrici
+* *mult_vect* per calcolare la moltiplicazione tra una matrice ed un vettore
+* *system* per risolvere un sistema lineare del tipo Ax=b attraverso l'eliminazione di Gauss
+* *inverse* per lacolcolare l'inversa di una matrice con il metodo di Gauss-Jordan
+
+Oltre a questi metodi principali, vengono implementati altri metodi ausiliari quali:
+* *getRows* per ottenere il numero di righe
+* *getCols* per ottenere il numero di colonne
+* *gauss* per calcolare la matrice ridotta con l'eliminazione di Gauss
+* *RemoveLastColumn* per rimuovere l'ultima colonna
+* *AddColumn* per aggiungere un vettore colonna
+* *print* per la stampa della matrice
 
 elenco file con breve descrizione
 
