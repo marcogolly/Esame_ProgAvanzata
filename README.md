@@ -5,7 +5,7 @@ Majer William,
 Vattolo Carlotta
 
 ## Il Progetto
-Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
+Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) in linguaggio C++ per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
 * *getRank* per il calcolo del rango della matrice utilizzando il metodo di Gauss
 * *getDeterminant* per il calcolo del determinante utilizzando il metodo di Laplace
 * *mult_matrix* per calcolare la moltiplocazione righe-colonne di due matrici
@@ -20,6 +20,11 @@ Oltre a questi metodi principali, vengono implementati altri metodi ausiliari qu
 * *RemoveLastColumn* per rimuovere l'ultima colonna
 * *AddColumn* per aggiungere un vettore colonna
 * *print* per la stampa della matrice
+
+Esterni alla classe vengono poi implemetate delle funzioni e degli operatri utili al fine di snellire il codice.
+Viene poi implementata la medesima classe ma rinominandola [ParallelMatrix](/parallel_matrix.hpp) utilizzando OpenCL per confrontare i tempi di esecuzione del codice.
+
+## I file
 
 elenco file con breve descrizione
 
