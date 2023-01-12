@@ -38,7 +38,7 @@ All'interno della repository sono presenti i seguenti file:
 * [file.cl](/file.cl) in cui vengono implementati i kernel riguardanti la classe ParallelMatrix
 * [opencl_processor.hpp](/opencl_processor.hpp) in cui si implementa una classe OpenCL per poter compilare ed eseguire in parallelo il codice
 * [CMakeLists.txt](/CMakeLists.txt) in cui è presente il codice per includere la libreria e gli header corrispondenti per la compilazione OpenCL
-* [main.cpp](/main.cpp) in cui si implementa in linguaggio C++ il codice necessario per il calcolo dei tempi di esecuione delle due classi (C++ e OpenCL)
+* [main.cpp](/main.cpp) in cui si implementa in linguaggio C++ il codice necessario per il calcolo dei tempi di esecuzione delle due classi (C++ e OpenCL)
 
 ## Requisiti per l'utilizzo <a name="requisiti"></a>
 Per poter compilare il progetto sono necessari
