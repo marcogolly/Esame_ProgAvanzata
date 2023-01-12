@@ -34,8 +34,19 @@ All'interno della repository sono presenti i seguenti file:
 * [main.cpp](/main.cpp) in cui si implementa in linguaggio C++ il codice necessario per il calcolo dei tempi di esecuione delle due classi (C++ e OpenCL)
 
 ## Requisiti
-Per poter utilizzare il progetto sono necessari un compilatore del linguaggio C++ ed un compilatore di OpenCl. Viene utilizzata la versione per quanto riguarda il linguaggio C++ e la versione 1.2 per quanto riguarda OpenCL
-requisiti, versione oepncl verisone c++
+Per poter compilare il progetto sono necessari
+* 'cmake' e un compilatore del linguaggio C e C++
+*  una libreria che implementi OpenCL
+*  il caricatore per i driver
+*  i driver dei dispositivi
+*  il binding C++ per OpenCL
+Viene utilizzata la versione 1.2 per quanto riguarda OpenCL
+
+- `cmake` e un compilatore C e C++
+- una libreria che implementi OpenCL, e.g., `pocl`
+- il caricatore per i driver, e.g., `ocl-icd-libopencl1`
+- i driver dei dispositivi, e.g., `pocl-opencl-icd`, `intel-opencl-icd`, `nvidia-opencl-icd`
+- il binding C++ per OpenCL, e.g., `opencl-clhpp`
 
 come si compila (comandi)
 
