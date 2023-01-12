@@ -47,6 +47,7 @@ Per poter compilare il progetto sono necessari
 *  il caricatore per i driver
 *  i driver dei dispositivi
 *  il binding C++ per OpenCL
+
 Viene utilizzata la versione 3.16 per il linguaggio C++ e la versione 1.2 per OpenCL
 
 ## Utilizzo (How to) <a name="utilizzo"></a>
