@@ -25,8 +25,10 @@ Esterni alla classe vengono poi implemetate delle funzioni e degli operatri util
 Viene poi implementata la medesima classe ma rinominandola [ParallelMatrix](/parallel_matrix.hpp) utilizzando OpenCL per confrontare i tempi di esecuzione del codice.
 
 ## I file
-
-elenco file con breve descrizione
+All'interno della repository sono presenti i seguenti file:
+* [matrix.hpp](/matrix.hpp) in cui viene implemetata la classe Matrix utilizzando il linguaggio C++
+* [parallel_matrix.hpp](/parallel_matrix.hpp) in cui viene implementata la classe ParallelMatrix utilizzando il linguaggio OpenCL
+* [file.cl](/file.cl) in cui vengono implementati i kernel riguardanti la classe ParallelMatrix
 
 requisiti, versione oepncl verisone c++
 
