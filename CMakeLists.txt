@@ -14,9 +14,6 @@ INCLUDE_DIRECTORIES(${OpenCL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${OpenCL_LIBRARY})
 
 
-add_executable(matrici matrici.cpp)
-
-
 add_executable(main main.cpp)
 # linko la libreria all'eseguibile che sto compilando
 target_link_libraries(main ${OpenCL_LIBRARY})
