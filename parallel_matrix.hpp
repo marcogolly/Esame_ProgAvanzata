@@ -1,3 +1,6 @@
+#ifndef __parallel_matrix_hpp__  
+#define __parallel_matrix_hpp__ 
+
 #include <iostream>
 #include <ostream>
 #include <exception>
@@ -9,7 +12,9 @@
 
 #include <CL/opencl.hpp> //per binding C++ di OpenCL
 
-
+/**
+ * @brief Una classe per la rappresentazione delle matrici tramite programmazione parallela
+*/
 class ParallelMatrix : public OpenCLProcessor {
 protected:
     std::string kernel_name;   //!< nome della funzione del kernel
@@ -301,4 +306,4 @@ public:
 };
 
 
-
+#endif  // __parallel_matrix_hpp__
