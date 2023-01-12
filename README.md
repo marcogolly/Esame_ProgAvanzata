@@ -51,7 +51,14 @@ Per poter compilare il progetto sono necessari
 Viene utilizzata la versione 3.16 per il linguaggio C++ e la versione 1.2 per OpenCL
 
 ## Utilizzo (How to) <a name="utilizzo"></a>
-Per poter compilare il presente progetto bisogna eseguire i seguenti comandi
+Per poter compilare il presente progetto bisogna eseguire i seguenti comandi da terminale
+
+
+`ninja` per compilare
+
+`.\main` per eseguire
+
+
 
 ## Ossrvazioni e commenti <a name="oss"></a>
 Dopo aver eseguito i codici con matrici di diverse dimensioni, abbiamo notato i risultati di seguito commentati.
