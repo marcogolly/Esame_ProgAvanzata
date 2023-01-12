@@ -1,12 +1,12 @@
-#ifndef __matrici_hpp__  
-#define __matrici_hpp__ 
+#ifndef __matrix_hpp__  
+#define __matrix_hpp__ 
 
-#include <algorithm>
-#include <cmath>
-#include <exception>
 #include <iostream>
 #include <ostream>
 #include <vector>
+#include <algorithm>
+#include <cmath>
+#include <exception>
 
 
 /**
@@ -568,4 +568,4 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& b)
 }
 
 
-#endif  // __matrici_hpp__
+#endif  // __matrix_hpp__
