@@ -213,7 +213,7 @@ public:
         cl::CommandQueue queue(context, device);
 
         // sottometto il kernel
-        enqueue_kernel(queue, kernel, cl::NDRange(rows,cols));     
+        enqueue_kernel(queue, kernel, cl::NDRange(rows));     
 
         queue.enqueueReadBuffer(resBuf, CL_TRUE, 0, datasize_res, res);
     }
