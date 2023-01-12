@@ -33,6 +33,8 @@ All'interno della repository sono presenti i seguenti file:
 * [CMakeLists.txt](/CMakeLists.txt) in cui è presente il codice per includere la libreria e gli header corrispondenti per la compilazione OpenCL
 * [main.cpp](/main.cpp) in cui si implementa in linguaggio C++ il codice necessario per il calcolo dei tempi di esecuione delle due classi (C++ e OpenCL)
 
+## Requisiti
+Per il progetto viene utilizzata la versione per quanto riguarda il linguaggio C++ e la versione 1.2 per quanto riguarda OpenCL
 requisiti, versione oepncl verisone c++
 
 come si compila (comandi)
