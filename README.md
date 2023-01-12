@@ -4,10 +4,12 @@ Gollinucci Marco,
 Majer William, 
 Vattolo Carlotta
 
-# Indice dei contenuti del presente file
+# Indice dei contenuti
 * [Introduzione al progetto](#progetto)
 * [Descrizione dei file](#file)
 * [Requisiti](#requisiti)
+* [Utilizzo (How To)](#utilizzo)
+* [Osservazioni e commenti](#oss)
 
 ## Il Progetto <a name="progetto"></a>
 Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) in linguaggio C++ per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
@@ -47,10 +49,10 @@ Per poter compilare il progetto sono necessari
 *  il binding C++ per OpenCL
 Viene utilizzata la versione 3.16 per il linguaggio C++ e la versione 1.2 per OpenCL
 
-come si compila (comandi)
+## Utilizzo (How to) <a name="utilizzo"></a>
+Per poter compilare il presente progetto bisogna eseguire i seguenti comandi
 
-come si runna il main
-
-piccol esposizione dei risultati sui garfici
-
-c++ da 10x10 in poi molto lento con det, system, inverse
+## Ossrvazioni e commenti <a name="oss"></a>
+Dopo aver eseguito i codici con matrici di diverse dimensioni, abbiamo notato i risultati di seguito commentati.
+Eseguendo le classi con matrici di dimensioni ridotte, ovvero minori o uguali a 10x10, il linguaggio C++ e la relativa paralellizazione rimangono grosso modo equivalenti rispetto ai tempi di esecuzione. In alcune esecuzioni risulta addirittura più veloce la sequenzialità classica di C++ che non la parallelizzazione con OpenCL. 
+Aumentando le dimensioni della matrice e, quindi, oltrepassando la dimensione 10x10, vi è una notevole differenza. L'esecuzione sequenziale viene superata notevolmente dall'esecuzione parallela che rimane in linea alle matrici piccole.
