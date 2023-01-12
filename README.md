@@ -4,7 +4,12 @@ Gollinucci Marco,
 Majer William, 
 Vattolo Carlotta
 
-## Il Progetto
+# Indice dei contenuti del presente file
+* [Introduzione al progetto](#progetto)
+* [Descrizione dei file](#file)
+* [Requisiti](#requisiti)
+
+## Il Progetto <a name="progetto"></a>
 Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) in linguaggio C++ per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
 * *getRank* per il calcolo del rango della matrice utilizzando il metodo di Gauss
 * *getDeterminant* per il calcolo del determinante utilizzando il metodo di Laplace
@@ -24,7 +29,7 @@ Oltre a questi metodi principali, vengono implementati altri metodi ausiliari qu
 Esterni alla classe vengono poi implemetate delle funzioni e degli operatri utili al fine di snellire il codice.
 Viene poi implementata la medesima classe ma rinominandola [ParallelMatrix](/parallel_matrix.hpp) utilizzando OpenCL per confrontare i tempi di esecuzione del codice.
 
-## I file
+## I file <a name="file"></a>
 All'interno della repository sono presenti i seguenti file:
 * [matrix.hpp](/matrix.hpp) in cui viene implemetata la classe Matrix utilizzando il linguaggio C++
 * [parallel_matrix.hpp](/parallel_matrix.hpp) in cui viene implementata la classe ParallelMatrix utilizzando OpenCL
@@ -33,20 +38,14 @@ All'interno della repository sono presenti i seguenti file:
 * [CMakeLists.txt](/CMakeLists.txt) in cui è presente il codice per includere la libreria e gli header corrispondenti per la compilazione OpenCL
 * [main.cpp](/main.cpp) in cui si implementa in linguaggio C++ il codice necessario per il calcolo dei tempi di esecuione delle due classi (C++ e OpenCL)
 
-## Requisiti
+## Requisiti per l'utilizzo <a name="requisiti"></a>
 Per poter compilare il progetto sono necessari
-* 'cmake' e un compilatore del linguaggio C e C++
+* `cmake` e un compilatore del linguaggio C e C++
 *  una libreria che implementi OpenCL
 *  il caricatore per i driver
 *  i driver dei dispositivi
 *  il binding C++ per OpenCL
-Viene utilizzata la versione 1.2 per quanto riguarda OpenCL
-
-- `cmake` e un compilatore C e C++
-- una libreria che implementi OpenCL, e.g., `pocl`
-- il caricatore per i driver, e.g., `ocl-icd-libopencl1`
-- i driver dei dispositivi, e.g., `pocl-opencl-icd`, `intel-opencl-icd`, `nvidia-opencl-icd`
-- il binding C++ per OpenCL, e.g., `opencl-clhpp`
+Viene utilizzata la versione 3.16 per il linguaggio C++ e la versione 1.2 per OpenCL
 
 come si compila (comandi)
 
