@@ -60,7 +60,7 @@ void get_avg_execution_time_Matrix(Matrix<T>& A, const Matrix<T>& B, std::vector
  * @tparam MULTIPLIER è la classe moltiplicatore di matrici considerata dal test
  * @tparam TIMESCALE è l'unità di misura dei tempi calcolati
  * @param A_rows è il numero di righe della prima matrice 
- * @param A_cols è il numero di colonne della prima matrice 
+ * @param A_cols è il numero di colonne della prima matrice e il numero di righe della seconda matrice
  * @param B_cols è il numero di colonne della seconda matrice 
  * @param repetitions è il numero di ripetizioni di ciascuna funzione
  */
@@ -87,48 +87,47 @@ void get_avg_execution_time_ParallelMatrix(const unsigned int A_rows=10, const u
         multiplier.getRank(A.data(), A_rows, A_cols, &rank);
     }
     auto t1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Tempo di esecuzione di getRank(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout << "Tempo di esecuzione di getRank(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
 
     t0 = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i<repetitions; ++i) {
         multiplier.getDeterminant(A.data(), A_rows, A_cols, &det);
     }
     t1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Tempo di esecuzione di getDeterminant(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout << "Tempo di esecuzione di getDeterminant(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
 
     t0 = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i<repetitions; ++i) {
         multiplier.mult_matrix(A.data(), B.data(), C.data(), A_rows, A_cols, B_cols);
     }
     t1 = std::chrono::high_resolution_clock::now();
-    std::cout <<  "Tempo di esecuzione di mult_matrix(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout <<  "Tempo di esecuzione di mult_matrix(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
 
     t0 = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i<repetitions; ++i) {
         multiplier.mult_vect(A.data(), b.data(), res.data(), A_rows, A_cols);
     }
     t1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Tempo di esecuzione di mult_vect(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout << "Tempo di esecuzione di mult_vect(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
 
     t0 = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i<repetitions; ++i) {
         multiplier.system(A.data(), b.data(), x.data(), A_rows, A_cols);
     }
     t1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Tempo di esecuzione di system(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout << "Tempo di esecuzione di system(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
 
     t0 = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i<repetitions; ++i) {
         multiplier.inverse(A.data(), inv.data(), A_rows, A_cols);
     }
     t1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Tempo di esecuzione di inverse(): " << std::chrono::duration_cast<TIMESCALE>(t1 - t0).count()/repetitions << " microseconds" << std::endl;
+    std::cout << "Tempo di esecuzione di inverse(): " << std::chrono::duration_cast<TIMESCALE>(t1-t0).count()/repetitions << " microseconds" << std::endl;
        
 }
 
 int main()
-{
-    
+{   
     srand(time(0)); 
     int N = 10;
     Matrix<float> A(N, N),  B(N, N);
