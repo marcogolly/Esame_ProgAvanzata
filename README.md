@@ -55,5 +55,7 @@ Per poter compilare il presente progetto bisogna eseguire i seguenti comandi
 
 ## Ossrvazioni e commenti <a name="oss"></a>
 Dopo aver eseguito i codici con matrici di diverse dimensioni, abbiamo notato i risultati di seguito commentati.
+
 Eseguendo le classi con matrici di dimensioni ridotte, ovvero minori o uguali a 10x10, il linguaggio C++ e la relativa paralellizazione rimangono grosso modo equivalenti rispetto ai tempi di esecuzione. In alcune esecuzioni risulta addirittura più veloce la sequenzialità classica di C++ che non la parallelizzazione con OpenCL. 
+
 Aumentando le dimensioni della matrice e, quindi, oltrepassando la dimensione 10x10, vi è una notevole differenza. L'esecuzione sequenziale viene superata notevolmente dall'esecuzione parallela che rimane in linea alle matrici piccole.
