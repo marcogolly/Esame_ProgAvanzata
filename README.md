@@ -1,4 +1,4 @@
-# Esame di Programmazione Avanzata e Parrallela
+# Esame di Programmazione Avanzata e Parallela
 Cancian Piero, 
 Gollinucci Marco, 
 Majer William, 
@@ -15,7 +15,7 @@ Vattolo Carlotta
 Il progetto riguarda l'implementazione di una classe [Matrix](/matrix.hpp) in linguaggio C++ per la rappresentazione delle matrici. All'interno della classe stessa vengono definiti i seguenti metodi:
 * *getRank* per il calcolo del rango della matrice utilizzando il metodo di Gauss
 * *getDeterminant* per il calcolo del determinante utilizzando il metodo di Laplace
-* *mult_matrix* per calcolare la moltiplocazione righe-colonne di due matrici
+* *mult_matrix* per calcolare la moltiplicazione righe-colonne di due matrici
 * *mult_vect* per calcolare la moltiplicazione tra una matrice ed un vettore
 * *system* per risolvere un sistema lineare del tipo Ax=b attraverso l'eliminazione di Gauss
 * *inverse* per calcolare l'inversa di una matrice con il metodo di Gauss-Jordan
@@ -28,12 +28,12 @@ Oltre a questi metodi principali, vengono implementati altri metodi ausiliari qu
 * *AddColumn* per aggiungere un vettore colonna
 * *print* per la stampa della matrice
 
-Esterni alla classe vengono poi implemetate delle funzioni e degli operatri utili al fine di snellire il codice.
+Esterni alla classe vengono poi implementate delle funzioni e degli operatori utili al fine di snellire il codice.
 Viene poi implementata la medesima classe ma rinominandola [ParallelMatrix](/parallel_matrix.hpp) utilizzando OpenCL per confrontare i tempi di esecuzione del codice.
 
 ## I file <a name="file"></a>
 All'interno della repository sono presenti i seguenti file:
-* [matrix.hpp](/matrix.hpp) in cui viene implemetata la classe Matrix utilizzando il linguaggio C++
+* [matrix.hpp](/matrix.hpp) in cui viene implementata la classe Matrix utilizzando il linguaggio C++
 * [parallel_matrix.hpp](/parallel_matrix.hpp) in cui viene implementata la classe ParallelMatrix utilizzando OpenCL
 * [file.cl](/file.cl) in cui vengono implementati i kernel riguardanti la classe ParallelMatrix
 * [opencl_processor.hpp](/opencl_processor.hpp) in cui si implementa una classe OpenCL che istanzia il primo dispositivo della prima piattaforma disponibile e consente di caricare il sorgente del kernel e di compilarlo.
@@ -60,9 +60,9 @@ Per poter compilare il presente progetto bisogna eseguire i seguenti comandi da 
 
 
 
-## Ossrvazioni e commenti <a name="oss"></a>
+## Osservazioni e commenti <a name="oss"></a>
 Dopo aver eseguito i codici con matrici di diverse dimensioni, abbiamo notato i risultati di seguito commentati.
 
-Eseguendo le classi con matrici di dimensioni ridotte, ovvero minori o uguali a 10x10, il linguaggio C++ e la relativa paralellizazione rimangono grosso modo equivalenti rispetto ai tempi di esecuzione. In alcune esecuzioni risulta addirittura più veloce la sequenzialità classica di C++ che non la parallelizzazione con OpenCL. 
+Eseguendo le classi con matrici di dimensioni ridotte, ovvero minori o uguali a 10x10, il linguaggio C++ e la relativa parallellizazione rimangono grosso modo equivalenti rispetto ai tempi di esecuzione. In alcune esecuzioni risulta addirittura più veloce la sequenzialità classica di C++ che non la parallelizzazione con OpenCL. 
 
 Aumentando le dimensioni della matrice e, quindi, oltrepassando la dimensione 10x10, vi è una notevole differenza. L'esecuzione sequenziale viene superata notevolmente dall'esecuzione parallela che rimane in linea alle matrici piccole.
