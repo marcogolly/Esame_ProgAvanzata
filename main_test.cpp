@@ -39,15 +39,26 @@ void get_avg_execution_time_Matrix(Matrix<T> &A, const Matrix<T> &B,
 }
 
 template<typename MULTIPLIER, typename TIMESCALE=std::chrono::microseconds>
-void get_avg_execution_time_ParallelMatrix(Matrix<float> &A, const Matrix<float> &B,
-                                   std::vector<float> &b,
-                                   const unsigned int repetitions = 4) {
+void get_avg_execution_time_ParallelMatrix(const unsigned int A_rows=10, const unsigned int A_cols=10, const unsigned int B_cols=10, const unsigned int repetitions=4) {
+  
+  std::vector<float> A(A_rows*A_cols), B(A_cols*B_cols), b(A_rows);
+    std::vector<float> C(A_rows*B_cols), res(A_rows), x(A_cols), inv(A_rows*A_rows);
+
+    srand(time(0)); 
+    for (int i = 0; i < A_rows*A_cols; i++) 
+        {A[i] = rand()%20;}
+    for (int i = 0; i < A_cols*B_cols; i++) 
+        {B[i] = rand()%20;}
+    for (int i = 0; i < A_rows; i++) 
+        {b[i] = rand()%20;}
+
   std::vector<std::string> nomi_metodi = {"rango", "determinante", "A*B", "A*b", "sistema lineare", "inversa"};
+  
   MULTIPLIER multiplier;
   std::vector<std::function<void()>> method_calls = {
-      [&]() {multiplier.getRank(); },      [&]() {multiplier.getDeterminant(); },
-      [&]() {multiplier.mult_matrix(B); }, [&]() {multiplier.mult_vect(b); },
-      [&]() {multiplier.system(b); },      [&]() {multiplier.inverse(); }};
+      [&]() {multiplier.getRank(A.data(), A_rows, A_cols, nullptr); },      [&]() {multiplier.getDeterminant(A.data(), A_rows, A_cols, nullptr); },
+      [&]() {multiplier.mult_matrix(A.data(), B.data(), C.data(), A_rows, A_cols, B_cols); }, [&]() {multiplier.mult_vect(A.data(), b.data(), res.data(), A_rows, A_cols);},
+      [&]() { multiplier.system(A.data(), b.data(), x.data(), A_rows, A_cols); },      [&]() {multiplier.inverse(A.data(), inv.data(), A_rows, A_cols);}};
   
   for (unsigned int i = 0; i < method_calls.size(); i++) {
     auto t0 = std::chrono::high_resolution_clock::now();
