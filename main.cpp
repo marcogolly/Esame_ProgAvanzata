@@ -106,6 +106,7 @@ void get_avg_execution_time_ParallelMatrix(const unsigned int A_rows=10, const u
 }
 
 
+
 int main() 
 {
     srand(time(0));
@@ -137,3 +138,4 @@ int main()
 
     return 0;
 }
+
