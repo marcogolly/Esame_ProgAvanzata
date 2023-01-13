@@ -170,7 +170,6 @@ public:
                             max = -max;
                         // se vado in overflow alzo un'eccezione
                         if (res[i][j]>max){
-                            std::cout << "Questo " << res[i][j] << " è maggiore di " << max <<std::endl;
                             throw std::overflow_error("Errore: impossible utilizzare gauss con questa matrice, valori troppo grandi. Prova a convertire in un tipo più grande (ad esempio longint oppure float");
                         }
                         res[i][j] *= res[pivot_row][pivot_col];
