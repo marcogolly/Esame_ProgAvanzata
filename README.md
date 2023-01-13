@@ -4,6 +4,7 @@ Gollinucci Marco,
 Majer William, 
 Vattolo Carlotta
 
+
 # Indice dei contenuti
 * [Introduzione al progetto](#progetto)
 * [Descrizione dei file](#file)
